@@ -1,0 +1,77 @@
+@using DotNetAdmin.Core.Data.Entities
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var role = (Role)ViewBag.Role;
+    var allPerms = (List<Permission>)ViewBag.AllPermissions;
+    var assignedIds = (HashSet<string>)ViewBag.AssignedIds;
+
+    var grouped = allPerms
+        .GroupBy(p => p.GuardName ?? "web")
+        .OrderBy(g => g.Key)
+        .ToList();
+}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Permissions — @role.Name</h1>
+    <a href="@Url.RouteUrl("admin.v1.access.role.index")" class="btn btn-danger">
+        <i class="fas fa-arrow-left me-1"></i> Back
+    </a>
+</div>
+
+<form method="post"
+      action="@Url.RouteUrl("admin.v1.access.role.permission.sync", new { id = role.Id })?_method=PUT"
+      id="perm-form">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="permissions" id="perm-ids">
+
+    <div class="tw-card p-6 mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h2 class="text-lg font-bold" style="color:var(--primary)">Assign Permissions</h2>
+            <div class="d-flex gap-2">
+                <button type="button" onclick="selectAll()" class="btn btn-primary-tw btn-sm">Select All</button>
+                <button type="button" onclick="deselectAll()" class="btn btn-danger btn-sm">Deselect All</button>
+                <button type="button" onclick="savePerms()" class="btn btn-success">
+                    <i class="fas fa-save me-1"></i> Save
+                </button>
+            </div>
+        </div>
+
+        @foreach (var group in grouped)
+        {
+            <div class="mb-5">
+                <h3 class="text-sm font-bold uppercase tracking-wider mb-2 px-2 py-1 rounded"
+                    style="background:var(--theme-light);color:var(--theme-dark)">
+                    Guard: @group.Key
+                </h3>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var perm in group.OrderBy(p => p.Name))
+                    {
+                        <label class="d-flex align-items-center gap-1.5 px-3 py-1.5 rounded border text-sm cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" class="perm-check form-check-input" value="@perm.Id"
+                                   @(assignedIds.Contains(perm.Id) ? "checked" : "")>
+                            <span>
+                                <span class="badge bg-blue-100 text-blue-700 me-1">@perm.Method</span>
+                                @perm.Name
+                            </span>
+                        </label>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (!allPerms.Any())
+        {
+            <p class="text-gray-400 text-center py-8">No permissions found. Run permission sync first.</p>
+        }
+    </div>
+</form>
+
+<script>
+function selectAll()  { document.querySelectorAll('.perm-check').forEach(c => c.checked = true); }
+function deselectAll(){ document.querySelectorAll('.perm-check').forEach(c => c.checked = false); }
+function savePerms() {
+    const ids = [...document.querySelectorAll('.perm-check:checked')].map(c => c.value);
+    document.getElementById('perm-ids').value = ids.join(',');
+    document.getElementById('perm-form').submit();
+}
+</script>

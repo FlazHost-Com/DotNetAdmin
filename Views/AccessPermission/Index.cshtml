@@ -1,0 +1,138 @@
+@using DotNetAdmin.Core.Data.Entities
+@using DotNetAdmin.Modules.Access.Permission.Dtos
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var result = (PaginationResult<Permission>)ViewBag.Result;
+    var filter = (PermissionFilterDto)ViewBag.Filter;
+}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Permission Management</h1>
+    <span class="text-sm text-gray-400">Auto-synced from routes. Read-only index.</span>
+</div>
+
+<div class="tw-card p-0 overflow-hidden">
+    <form method="get" action="@Url.RouteUrl("admin.v1.access.permission.index")" class="p-4 border-b border-gray-100">
+        <div class="d-flex gap-3 flex-wrap">
+            <input type="text" name="Search" value="@filter.Search" placeholder="Search permission name..."
+                   class="form-control" style="max-width:280px">
+            <select name="GuardName" class="form-control" style="max-width:130px">
+                <option value="">All Guards</option>
+                <option value="web" selected="@(filter.GuardName == "web")">web</option>
+                <option value="api" selected="@(filter.GuardName == "api")">api</option>
+            </select>
+            <select name="Method" class="form-control" style="max-width:110px">
+                <option value="">All Methods</option>
+                @foreach (var m in new[] { "GET", "POST", "PUT", "PATCH", "DELETE" })
+                {
+                    <option value="@m" selected="@(filter.Method?.ToUpper() == m)">@m</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-primary-tw"><i class="fas fa-search me-1"></i> Filter</button>
+            <a href="@Url.RouteUrl("admin.v1.access.permission.index")" class="btn btn-danger">Reset</a>
+        </div>
+    </form>
+
+    <form id="bulk-form" method="post" action="@Url.RouteUrl("admin.v1.access.permission.delete_selected")?_method=DELETE">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="ids" id="bulk-ids">
+
+        <div class="p-3 border-b border-gray-100 d-flex gap-2">
+            <button type="button" onclick="deleteSelected()" class="btn btn-danger btn-sm">
+                <i class="fas fa-trash me-1"></i> Delete Selected
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th style="width:36px"><input type="checkbox" id="check-all" class="form-check-input"></th>
+                        <th>Filter Row</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>#</th>
+                        <th>Name (Route)</th>
+                        <th>Method</th>
+                        <th>Guard</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @{int rowNum = result.From;}
+                @foreach (var perm in result.Data)
+                {
+                    var methodColor = perm.Method switch {
+                        "GET"    => "bg-green-100 text-green-800",
+                        "POST"   => "bg-blue-100 text-blue-800",
+                        "PUT"    => "bg-yellow-100 text-yellow-800",
+                        "PATCH"  => "bg-orange-100 text-orange-800",
+                        "DELETE" => "bg-red-100 text-red-800",
+                        _        => "bg-gray-100 text-gray-800"
+                    };
+                    <tr>
+                        <td><input type="checkbox" class="row-check form-check-input" value="@perm.Id"></td>
+                        <td>@rowNum</td>
+                        <td class="font-mono text-xs">@perm.Name</td>
+                        <td><span class="badge @methodColor">@perm.Method</span></td>
+                        <td><span class="badge bg-indigo-100 text-indigo-800">@perm.GuardName</span></td>
+                        <td>
+                            <span class="badge @(perm.Status == "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600")">
+                                @perm.Status
+                            </span>
+                        </td>
+                        <td>
+                            <form method="post" action="@Url.RouteUrl("admin.v1.access.permission.delete", new { id = perm.Id })?_method=DELETE"
+                                  onsubmit="return confirm('Delete this permission?')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    rowNum++;
+                }
+                @if (!result.Data.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-gray-400 py-8">No permissions found.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </form>
+
+    @if (result.TotalPages > 1)
+    {
+        <div class="p-4 d-flex align-items-center justify-content-between border-t border-gray-100">
+            <span class="text-sm text-gray-500">Showing @result.From–@result.To of @result.TotalCount</span>
+            <ul class="pagination">
+                @if (result.HasPrev) {
+                    <li class="page-item"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.permission.index", new { filter.Search, filter.GuardName, filter.Method, Page = result.Page - 1 })">&laquo;</a></li>
+                }
+                @{ int pS = Math.Max(1, result.Page - 2); int pE = Math.Min(result.TotalPages, result.Page + 2); }
+                @if (pS > 1) { <li class="page-item"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.permission.index", new { filter.Search, filter.GuardName, filter.Method, Page = 1 })">1</a></li> if (pS > 2) { <li class="page-item disabled"><span class="page-link">…</span></li> } }
+                @for (int p = pS; p <= pE; p++) {
+                    <li class="page-item @(p == result.Page ? "active" : "")"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.permission.index", new { filter.Search, filter.GuardName, filter.Method, Page = p })">@p</a></li>
+                }
+                @if (pE < result.TotalPages) { if (pE < result.TotalPages - 1) { <li class="page-item disabled"><span class="page-link">…</span></li> } <li class="page-item"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.permission.index", new { filter.Search, filter.GuardName, filter.Method, Page = result.TotalPages })">@result.TotalPages</a></li> }
+                @if (result.HasNext) {
+                    <li class="page-item"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.permission.index", new { filter.Search, filter.GuardName, filter.Method, Page = result.Page + 1 })">&raquo;</a></li>
+                }
+            </ul>
+        </div>
+    }
+</div>
+
+<script>
+document.getElementById('check-all').addEventListener('change', function() {
+    document.querySelectorAll('.row-check').forEach(c => c.checked = this.checked);
+});
+function deleteSelected() {
+    const ids = [...document.querySelectorAll('.row-check:checked')].map(c => c.value);
+    if (!ids.length) { alert('Select at least one permission.'); return; }
+    if (!confirm('Delete ' + ids.length + ' permission(s)?')) return;
+    document.getElementById('bulk-ids').value = ids.join(',');
+    document.getElementById('bulk-form').submit();
+}
+</script>

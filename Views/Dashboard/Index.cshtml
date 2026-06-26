@@ -1,0 +1,176 @@
+@{
+    Layout = "_AdminLayout";
+    ViewBag.Title = "Dashboard";
+}
+
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
+        <p class="text-sm text-gray-500">Welcome back, @ViewBag.AuthName — @DateTime.Now.ToString("dddd, MMMM dd, yyyy")</p>
+    </div>
+</div>
+
+@* 4 Stat Cards *@
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="tw-card p-6" style="border-left:4px solid var(--primary)">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">Total Users</p>
+                <p class="text-3xl font-bold text-gray-800 counter" data-target="@ViewBag.UserCount">0</p>
+            </div>
+            <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background:var(--theme-light)">
+                <i class="fas fa-users text-xl" style="color:var(--primary)"></i>
+            </div>
+        </div>
+    </div>
+    <div class="tw-card p-6" style="border-left:4px solid #10B981">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">Total Roles</p>
+                <p class="text-3xl font-bold text-gray-800 counter" data-target="@ViewBag.RoleCount">0</p>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
+                <i class="fas fa-user-shield text-xl text-green-600"></i>
+            </div>
+        </div>
+    </div>
+    <div class="tw-card p-6" style="border-left:4px solid #8B5CF6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">Permissions</p>
+                <p class="text-3xl font-bold text-gray-800 counter" data-target="@ViewBag.PermissionCount">0</p>
+            </div>
+            <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
+                <i class="fas fa-key text-xl text-purple-600"></i>
+            </div>
+        </div>
+    </div>
+    <div class="tw-card p-6" style="border-left:4px solid var(--secondary)">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm">Active Theme</p>
+                <p class="text-xl font-bold mt-1" style="color:var(--primary)">@ViewBag.ActiveTheme</p>
+            </div>
+            <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background:var(--primary)">
+                <i class="fas fa-palette text-xl text-white"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* 2 Charts *@
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="tw-card p-6">
+        <h3 class="text-sm font-semibold text-gray-700 mb-4">User Growth (last 6 months)</h3>
+        <div class="h-64"><canvas id="lineChart"></canvas></div>
+    </div>
+    <div class="tw-card p-6">
+        <h3 class="text-sm font-semibold text-gray-700 mb-4">Role Distribution</h3>
+        <div class="h-64"><canvas id="doughnutChart"></canvas></div>
+    </div>
+</div>
+
+@* Recent Activities + Top Roles *@
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div class="tw-card p-6">
+        <h3 class="text-sm font-semibold text-gray-700 mb-4">Recent Activities</h3>
+        <ul class="space-y-3">
+            <li class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:var(--theme-light)">
+                    <i class="fas fa-user-plus text-xs" style="color:var(--primary)"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-700">Admin user created</p>
+                    <p class="text-xs text-gray-400">system · startup</p>
+                </div>
+            </li>
+            <li class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:var(--theme-light)">
+                    <i class="fas fa-key text-xs" style="color:var(--primary)"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-700">Permissions synced from routes</p>
+                    <p class="text-xs text-gray-400">system · @ViewBag.PermissionCount total permissions</p>
+                </div>
+            </li>
+            <li class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-green-100">
+                    <i class="fas fa-check text-xs text-green-600"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-700">Database migrated successfully</p>
+                    <p class="text-xs text-gray-400">system · startup</p>
+                </div>
+            </li>
+            <li class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-blue-100">
+                    <i class="fas fa-server text-xs text-blue-600"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-700">ASP.NET Core .NET 10 LTS</p>
+                    <p class="text-xs text-gray-400">runtime · EF Core 10 · Vertical Slice</p>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="tw-card p-6">
+        <h3 class="text-sm font-semibold text-gray-700 mb-4">Top Roles</h3>
+        <ul class="space-y-2">
+            <li class="flex items-center justify-between py-2 border-b border-gray-100">
+                <span class="text-sm font-medium text-gray-700">Administrator</span>
+                <span class="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-700">web</span>
+            </li>
+            <li class="flex items-center justify-between py-2">
+                <span class="text-sm text-gray-500">@ViewBag.RoleCount total role(s)</span>
+                <a href="/admin/v1/access/role" class="text-xs" style="color:var(--primary)">View all →</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+document.querySelectorAll('.counter').forEach(function(el) {
+    var target = parseInt(el.getAttribute('data-target')) || 0;
+    if (target === 0) { el.textContent = '0'; return; }
+    var start = 0;
+    var step = Math.ceil(target / 80);
+    var timer = setInterval(function() {
+        start = Math.min(start + step, target);
+        el.textContent = start.toLocaleString();
+        if (start >= target) clearInterval(timer);
+    }, 16);
+});
+
+var primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#3B82F6';
+var secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim() || '#60A5FA';
+
+new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: {
+        labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+        datasets: [{
+            label: 'Users',
+            data: [1, 1, 1, 1, 1, @ViewBag.UserCount],
+            borderColor: primary,
+            backgroundColor: primary + '20',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+});
+
+new Chart(document.getElementById('doughnutChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Administrator', 'Other'],
+        datasets: [{
+            data: [Math.max(@ViewBag.RoleCount, 1), 0],
+            backgroundColor: [primary, secondary]
+        }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+</script>
+}
