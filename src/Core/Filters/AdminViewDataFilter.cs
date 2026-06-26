@@ -61,6 +61,10 @@ public class AdminViewDataFilter : IAsyncActionFilter
                                        rp.Permission.Name == routeName &&
                                        rp.Permission.Method == method.ToUpper());
                     });
+
+                    // HasRoleFn: Func<roleName, bool> — used in views to gate UI by role name
+                    controller.ViewBag.HasRoleFn = new Func<string, bool>(roleName =>
+                        roles.Any(r => r.Name == roleName));
                 }
             }
 

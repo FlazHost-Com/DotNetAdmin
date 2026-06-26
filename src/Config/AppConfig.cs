@@ -46,6 +46,7 @@ public class StorageConfig
     public string SecretKey { get; set; } = string.Empty;
     public string Region { get; set; } = string.Empty;
     public string BaseUrl { get; set; } = string.Empty;
+    public bool Ssl { get; set; } = false;
 }
 
 public class EmailConfig
@@ -55,4 +56,6 @@ public class EmailConfig
     public string User { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string From { get; set; } = "noreply@dotnetadmin.com";
+    public bool Secure { get; set; } = false;
+    public string FromName { get; set; } = "NodeAdmin";
 }

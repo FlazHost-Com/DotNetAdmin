@@ -121,6 +121,9 @@ app.Use(async (ctx, next) =>
 // 3. Method override BEFORE UseRouting (translates POST+?_method=PUT|DELETE)
 app.UseMiddleware<MethodOverrideMiddleware>();
 
+// 3a. CSRF query-param promotion (?_csrf= → X-CSRF-TOKEN header, NodeAdmin standard)
+app.UseMiddleware<CsrfQueryMiddleware>();
+
 // 4. Response compression
 app.UseResponseCompression();
 

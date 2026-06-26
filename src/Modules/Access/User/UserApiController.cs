@@ -19,7 +19,18 @@ public class UserApiController : ControllerBase
     public async Task<IActionResult> Index([FromQuery] UserFilterDto filter)
     {
         var result = await _userService.GetAllAsync(filter);
-        return Ok(new { success = true, data = result.Data, meta = new { result.Page, result.PageSize, result.TotalCount, result.TotalPages } });
+        return Ok(new
+        {
+            success = true,
+            datas = result.Data,
+            paginate_data = new
+            {
+                total_data = result.TotalCount,
+                page_size = result.PageSize,
+                current_page = result.Page,
+                total_page = result.TotalPages
+            }
+        });
     }
 
     [HttpGet("/api/v1/access/user/{id}", Name = "api.v1.access.user.show")]

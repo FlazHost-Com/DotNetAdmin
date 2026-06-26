@@ -36,7 +36,7 @@
                     <div>
                         <label class="form-label">Full Name</label>
                         <input name="name" type="text" class="form-control" placeholder="John Doe"
-                               value="@ViewBag.OldName" required>
+                               value="@ViewBag.OldName" autocomplete="name" required>
                     </div>
                     <div>
                         <label class="form-label">Code</label>
@@ -47,7 +47,7 @@
                 <div>
                     <label class="form-label">Email</label>
                     <input name="email" type="email" class="form-control" placeholder="you@example.com"
-                           value="@ViewBag.OldEmail" required>
+                           value="@ViewBag.OldEmail" autocomplete="email" required>
                 </div>
                 <div>
                     <label class="form-label">Phone</label>
@@ -56,11 +56,11 @@
                 </div>
                 <div>
                     <label class="form-label">Password</label>
-                    <input name="password" type="password" class="form-control" placeholder="Min. 8 chars" required>
+                    <input name="password" type="password" class="form-control" placeholder="Min. 8 chars" autocomplete="new-password" required>
                 </div>
                 <div>
                     <label class="form-label">Confirm Password</label>
-                    <input name="passwordConfirm" type="password" class="form-control" placeholder="••••••••" required>
+                    <input name="passwordConfirm" type="password" class="form-control" placeholder="••••••••" autocomplete="new-password" required>
                 </div>
                 <button type="submit" class="btn btn-primary-tw w-full py-2.5 font-semibold">
                     <i class="fas fa-user-plus"></i> Create Account
