@@ -42,12 +42,16 @@ public static class DbSeeder
             var user = new User
             {
                 Id = Guid.NewGuid().ToString(),
-                Code = "ADM001",
+                Code = "0000000001",
                 Name = "Administrator",
+                Phone = "12345678910",
                 Email = "admin@admin.com",
+                EmailVerifiedAt = DateTime.UtcNow,
                 Password = BCrypt.Net.BCrypt.HashPassword("12345678"),
                 Status = "Active",
-                Timezone = "UTC",
+                Timezone = "Asia/Jakarta",
+                Blocked = false,
+                BlockedReason = "",
                 CreatedBy = "system",
                 UpdatedBy = "system"
             };

@@ -15,4 +15,9 @@ public interface IRoleService
     Task<List<PermissionEntity>> GetPermissionsForRoleAsync(string id);
     Task SyncPermissionsAsync(string roleId, IEnumerable<string> permissionIds);
     Task<List<PermissionEntity>> GetAllPermissionsAsync();
+    Task<PaginationResult<PermissionWithAssignedDto>> GetPermissionsPaginatedAsync(string roleId, RolePermissionFilterDto filter);
+    Task AssignPermissionAsync(string roleId, string permId);
+    Task UnassignPermissionAsync(string roleId, string permId);
+    Task AssignSelectedAsync(string roleId, IEnumerable<string> permIds);
+    Task UnassignSelectedAsync(string roleId, IEnumerable<string> permIds);
 }

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetAdmin.Modules.Access.Role.Dtos;
 
-public class RoleFilterDto
+public class RolePermissionFilterDto
 {
     [FromQuery(Name = "q_name")]      public string? QName { get; set; }
     [FromQuery(Name = "q_status")]    public string? QStatus { get; set; }

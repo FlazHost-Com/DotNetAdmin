@@ -4,357 +4,240 @@
 }
 
 <div class="flex items-center justify-between mb-6">
+  <div>
     <h1 class="text-2xl font-bold text-gray-800">UI Components</h1>
+    <p class="text-sm text-gray-600">Acuan elemen siap-pakai. Lihat <code>docs/UI_COMPONENTS.md</code> untuk snippet copy-paste.</p>
+  </div>
 </div>
 
-@* ── Section 1: Stat Card + Counter ── *@
-<div class="tw-card p-6 mb-6">
-    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">1. Stat Card + Counter</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="tw-card p-5 flex items-center gap-4" style="border-left:4px solid var(--primary)">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl shrink-0" style="background:var(--primary)">
-                <i class="fas fa-users"></i>
-            </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Users</p>
-                <p class="text-3xl font-bold counter" data-target="1250" style="color:var(--theme-dark)">0</p>
-            </div>
-        </div>
-        <div class="tw-card p-5 flex items-center gap-4" style="border-left:4px solid #10B981">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl shrink-0 bg-green-500">
-                <i class="fas fa-shopping-cart"></i>
-            </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Orders</p>
-                <p class="text-3xl font-bold counter text-green-700" data-target="842">0</p>
-            </div>
-        </div>
-        <div class="tw-card p-5 flex items-center gap-4" style="border-left:4px solid #8B5CF6">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl shrink-0 bg-purple-500">
-                <i class="fas fa-dollar-sign"></i>
-            </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Revenue</p>
-                <p class="text-3xl font-bold counter text-purple-700" data-target="98000">0</p>
-            </div>
-        </div>
-        <div class="tw-card p-5 flex items-center gap-4" style="border-left:4px solid #F59E0B">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xl shrink-0 bg-yellow-400">
-                <i class="fas fa-star"></i>
-            </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Reviews</p>
-                <p class="text-3xl font-bold counter text-yellow-700" data-target="4238">0</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-@* ── Section 2: Charts ── *@
-<div class="tw-card p-6 mb-6">
-    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">2. Chart</h2>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- ============ STAT CARDS + COUNTER ============ -->
+<section class="mb-10">
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">1. Stat Card + Counter</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="stat-card bg-white rounded-xl shadow-lg p-6 hover-scale" style="border-left:4px solid var(--primary)">
+      <div class="flex items-center justify-between">
         <div>
-            <h3 class="text-sm font-semibold text-gray-600 mb-3">Line Chart (Monthly Revenue)</h3>
-            <div class="h-56"><canvas id="lineChart"></canvas></div>
+          <p class="text-gray-600 text-sm font-medium">Total Item</p>
+          <p class="text-3xl font-bold text-gray-800 counter" data-target="1280">0</p>
+          <p class="text-green-500 text-sm mt-1"><i class="fas fa-arrow-up"></i> contoh tren</p>
         </div>
-        <div>
-            <h3 class="text-sm font-semibold text-gray-600 mb-3">Doughnut Chart (Category)</h3>
-            <div class="h-56"><canvas id="doughnutChart"></canvas></div>
+        <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background:var(--theme-light)">
+          <i class="fas fa-box text-xl" style="color:var(--primary)"></i>
         </div>
+      </div>
     </div>
-</div>
+    <div class="stat-card bg-white rounded-xl shadow-lg p-6 hover-scale border-l-4 border-green-500">
+      <div class="flex items-center justify-between">
+        <div><p class="text-gray-600 text-sm font-medium">Revenue</p><p class="text-3xl font-bold text-gray-800">$<span class="counter" data-target="42500">0</span></p></div>
+        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-dollar-sign text-green-600 text-xl"></i></div>
+      </div>
+    </div>
+    <div class="stat-card bg-white rounded-xl shadow-lg p-6 hover-scale border-l-4 border-purple-500">
+      <div class="flex items-center justify-between">
+        <div><p class="text-gray-600 text-sm font-medium">Conversion</p><p class="text-3xl font-bold text-gray-800"><span class="counter" data-target="87">0</span>%</p></div>
+        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center"><i class="fas fa-chart-line text-purple-600 text-xl"></i></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-@* ── Section 3: Badge & Status ── *@
-<div class="tw-card p-6 mb-6">
-    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">3. Badge &amp; Status</h2>
-    <div class="flex flex-wrap gap-3">
-        <span class="badge text-bg-primary px-3 py-1 text-sm rounded-full font-medium text-white" style="background:var(--primary)">Primary</span>
-        <span class="badge px-3 py-1 text-sm rounded-full font-medium bg-green-600 text-white">Active</span>
-        <span class="badge px-3 py-1 text-sm rounded-full font-medium bg-red-500 text-white">Inactive</span>
-        <span class="badge px-3 py-1 text-sm rounded-full font-medium bg-yellow-500 text-white">Pending</span>
-        <span class="badge px-3 py-1 text-sm rounded-full font-medium bg-gray-500 text-white">Default</span>
-        <span class="badge px-3 py-1 text-sm rounded-full font-medium bg-blue-500 text-white">Info</span>
-        <span class="badge px-3 py-1 text-sm rounded-full font-medium bg-purple-500 text-white">Web</span>
-        <span class="badge px-3 py-1 text-sm rounded-full font-medium bg-orange-500 text-white">API</span>
-    </div>
-</div>
+<!-- ============ CHARTS (themeable) ============ -->
+<section class="mb-10">
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">2. Chart (Chart.js, warna ikut tema)</h2>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl shadow-lg p-6"><h3 class="text-sm font-semibold text-gray-700 mb-3">Line Chart</h3><div class="h-64"><canvas id="demoLine"></canvas></div></div>
+    <div class="bg-white rounded-xl shadow-lg p-6"><h3 class="text-sm font-semibold text-gray-700 mb-3">Doughnut Chart</h3><div class="h-64"><canvas id="demoDoughnut"></canvas></div></div>
+  </div>
+</section>
 
-@* ── Section 4: Alert ── *@
-<div class="tw-card p-6 mb-6">
-    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">4. Alert</h2>
-    <div class="space-y-3">
-        <div class="flex items-start gap-3 p-4 rounded-lg border" style="background:var(--theme-light);border-color:var(--primary)">
-            <i class="fas fa-info-circle mt-0.5" style="color:var(--primary)"></i>
-            <p class="text-sm" style="color:var(--theme-dark)"><strong>Primary:</strong> This is a themed primary alert message.</p>
-        </div>
-        <div class="flex items-start gap-3 p-4 rounded-lg border bg-green-50 border-green-400">
-            <i class="fas fa-check-circle text-green-600 mt-0.5"></i>
-            <p class="text-sm text-green-800"><strong>Success:</strong> Operation completed successfully.</p>
-        </div>
-        <div class="flex items-start gap-3 p-4 rounded-lg border bg-yellow-50 border-yellow-400">
-            <i class="fas fa-exclamation-triangle text-yellow-600 mt-0.5"></i>
-            <p class="text-sm text-yellow-800"><strong>Warning:</strong> Please check before proceeding.</p>
-        </div>
-        <div class="flex items-start gap-3 p-4 rounded-lg border bg-red-50 border-red-400">
-            <i class="fas fa-times-circle text-red-600 mt-0.5"></i>
-            <p class="text-sm text-red-800"><strong>Error:</strong> Something went wrong. Please try again.</p>
-        </div>
-    </div>
-</div>
+<!-- ============ BADGES / STATUS ============ -->
+<section class="mb-10">
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">3. Badge & Status</h2>
+  <div class="bg-white rounded-xl shadow-lg p-6 flex flex-wrap items-center gap-3">
+    <span class="badge text-bg-primary">Primary</span>
+    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">Delivered</span>
+    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">Processing</span>
+    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">Shipped</span>
+    <span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm">Cancelled</span>
+    <span class="ml-4 text-sm text-gray-500">Status ikon:</span>
+    <i class="fas fa-check-circle text-green-500 text-xl" title="Active"></i>
+    <i class="fas fa-times-circle text-red-500 text-xl" title="Inactive"></i>
+  </div>
+</section>
 
-@* ── Section 5: Button & Dropdown ── *@
-<div class="tw-card p-6 mb-6">
-    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">5. Button &amp; Dropdown Action</h2>
-    <div class="flex flex-wrap gap-3 mb-4">
-        <button class="btn btn-primary-tw">Primary</button>
-        <button class="btn btn-success">Success</button>
-        <button class="btn btn-danger">Danger</button>
-        <button class="btn bg-yellow-500 text-white hover:bg-yellow-600">Warning</button>
-        <button class="btn bg-gray-500 text-white hover:bg-gray-600">Default</button>
-        <button class="btn btn-primary-tw btn-sm">Small</button>
-        <button class="btn btn-success" disabled>Disabled</button>
-    </div>
-    <div class="flex flex-wrap gap-3">
-        <div class="dropdown">
-            <button class="btn btn-primary-tw dropdown-toggle" data-toggle-dd>
-                Action
-            </button>
-            <div class="dropdown-menu">
-                <a href="#" class="dropdown-item"><i class="fas fa-eye"></i> View</a>
-                <a href="#" class="dropdown-item"><i class="fas fa-edit"></i> Edit</a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item danger"><i class="fas fa-trash"></i> Delete</a>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- ============ ALERT ============ -->
+<section class="mb-10">
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">4. Alert (flash)</h2>
+  <div class="alert alert-success shadow-sm">Contoh pesan sukses.</div>
+  <div class="alert alert-danger shadow-sm">Contoh pesan error.</div>
+  <div class="alert alert-info shadow-sm">Contoh pesan info.</div>
+  <div class="alert alert-warning shadow-sm">Contoh pesan peringatan.</div>
+  <div class="alert alert-primary shadow-sm">Contoh alert beraksen tema (ikut template switcher).</div>
+</section>
 
-@* ── Section 6: Modal / Toast / Confirm ── *@
-<div class="tw-card p-6 mb-6">
-    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">6. Modal / Toast / Confirm</h2>
-    <div class="flex flex-wrap gap-3">
-        <button class="btn btn-primary-tw" onclick="Toast('This is a success toast!', 'success')">Toast Success</button>
-        <button class="btn btn-danger" onclick="Toast('This is an error toast!', 'error')">Toast Error</button>
-        <button class="btn bg-yellow-500 text-white hover:bg-yellow-600" onclick="openModal('demo-modal')">Open Modal</button>
-        <button class="btn bg-gray-600 text-white hover:bg-gray-700" onclick="openConfirm('Are you sure you want to delete this item?', function(){ Toast('Deleted!', 'success'); })">Confirm Dialog</button>
+<!-- ============ BUTTON & DROPDOWN ============ -->
+<section class="mb-10">
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">5. Button & Dropdown Action</h2>
+  <div class="bg-white rounded-xl shadow-lg p-6 flex flex-wrap items-center gap-3">
+    <button class="btn btn-primary-tw px-4 py-2"><i class="fas fa-save me-1"></i> Primary</button>
+    <button class="btn btn-success btn-sm">Success</button>
+    <button class="btn btn-danger btn-sm">Danger</button>
+    <div class="btn-group">
+      <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle-dd aria-expanded="false">Action</button>
+      <div class="dropdown-menu dropdown-menu-end">
+        <a href="#" class="dropdown-item"><i class="fas fa-pen fa-fw"></i> Edit</a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item danger"><i class="fas fa-trash fa-fw"></i> Delete</a>
+      </div>
     </div>
+  </div>
+</section>
 
-    @* Demo Modal *@
-    <div id="demo-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div class="modal-header">
-                <span>Demo Modal</span>
-                <button onclick="closeModal('demo-modal')" class="modal-close"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <p>This is a demo modal dialog. You can put any content here.</p>
-            </div>
-            <div class="modal-footer">
-                <button onclick="closeModal('demo-modal')" class="btn bg-gray-200 text-gray-700">Cancel</button>
-                <button onclick="closeModal('demo-modal'); Toast('Action confirmed!', 'success')" class="btn btn-primary-tw">Confirm</button>
-            </div>
-        </div>
+<!-- ============ POPUP: Modal, Toast, Confirm ============ -->
+<section class="mb-10">
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">6. Popup (Modal / Toast / Confirm)</h2>
+  <div class="bg-white rounded-xl shadow-lg p-6 flex flex-wrap items-center gap-3">
+    <button class="btn btn-primary-tw px-4 py-2" onclick="Modal.open({ title:'Contoh Modal', body:'<p>Ini isi modal. Bisa teks/HTML/form.</p>' })">Buka Modal</button>
+    <button class="btn btn-success btn-sm" onclick="Toast('Tersimpan!', 'success')">Toast Success</button>
+    <button class="btn btn-danger btn-sm" onclick="Toast('Gagal menyimpan', 'error')">Toast Error</button>
+    <button class="btn btn-sm btn-primary" onclick="Toast('Sekadar info', 'info')">Toast Info</button>
+    <button class="btn btn-danger px-4 py-2 text-white" onclick="confirmDialog('Yakin hapus data ini?').then(function(ok){ Toast(ok?'Dikonfirmasi':'Dibatalkan', ok?'success':'info') })">Confirm Dialog</button>
+  </div>
+  <p class="text-sm text-gray-500 mt-2">Tombol/link hapus juga bisa pakai atribut <code>data-confirm="pesan"</code> &rarr; otomatis muncul confirm bertema sebelum submit.</p>
+</section>
+
+<!-- ============ FORM ============ -->
+<section class="mb-10">
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">7. Form (CRUD)</h2>
+  <div class="tw-card p-6">
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Text Input</label>
+      <input type="text" class="form-control" placeholder="contoh">
     </div>
-</div>
-
-@* ── Section 7: Form ── *@
-<div class="tw-card p-6 mb-6">
-    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">7. Form</h2>
-    <form class="space-y-4" onsubmit="return false">
-        <div>
-            <label class="form-label fw-semibold">Text Input</label>
-            <input type="text" class="form-control" placeholder="Enter text…">
-        </div>
-        <div>
-            <label class="form-label fw-semibold">Text Input (Invalid)</label>
-            <input type="text" class="form-control is-invalid" value="invalid value">
-            <div class="invalid-feedback">This field is required.</div>
-        </div>
-        <div>
-            <label class="form-label fw-semibold">Select</label>
-            <select class="form-control">
-                <option>Option 1</option>
-                <option>Option 2</option>
-                <option>Option 3</option>
-            </select>
-        </div>
-        <div>
-            <label class="form-label fw-semibold">Textarea</label>
-            <textarea class="form-control" rows="3" placeholder="Enter description…"></textarea>
-        </div>
-        <div>
-            <label class="form-label fw-semibold">File Input (with preview)</label>
-            <div class="mb-2" id="file-preview-box">
-                <img src="/media/access/user/user.png" style="max-width:120px" class="rounded border p-1">
-            </div>
-            <input type="file" class="form-control" accept="image/*" onchange="previewFormImage(event)">
-        </div>
-        <div>
-            <label class="form-label fw-semibold">Checkbox</label>
-            <div class="flex flex-wrap gap-4">
-                <label class="flex items-center gap-2"><input type="checkbox" class="form-check-input" checked> <span class="text-sm text-gray-700">Option A</span></label>
-                <label class="flex items-center gap-2"><input type="checkbox" class="form-check-input"> <span class="text-sm text-gray-700">Option B</span></label>
-                <label class="flex items-center gap-2"><input type="checkbox" class="form-check-input"> <span class="text-sm text-gray-700">Option C</span></label>
-            </div>
-        </div>
-        <div class="flex gap-2">
-            <button type="submit" class="btn btn-primary-tw">Submit</button>
-            <button type="reset" class="btn bg-gray-200 text-gray-700 hover:bg-gray-300">Reset</button>
-        </div>
-    </form>
-</div>
-
-@* ── Section 8: Rich Text Editor (Trumbowyg + File Manager) ── *@
-<div class="tw-card p-6 mb-6">
-    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">8. Rich Text Editor</h2>
-    <label class="form-label fw-semibold">Trumbowyg Editor with File Manager</label>
-    <textarea id="demo-editor" class="trumbowyg-editor form-control" name="content">
-        <p>Hello, this is a <strong>rich text editor</strong> demo. You can insert images using the File Manager button.</p>
-    </textarea>
-</div>
-
-@* ── Section 9: Data Table + Pagination ── *@
-<div class="tw-card p-6 mb-6">
-    <h2 class="text-lg font-bold mb-4" style="color:var(--primary)">9. Data Table + Pagination</h2>
-    <div class="mb-3 flex items-center justify-between">
-        <div class="flex gap-2">
-            <input type="text" class="form-control text-sm" placeholder="Search…" style="width:200px">
-            <button class="btn btn-primary-tw btn-sm">Search</button>
-        </div>
-        <div class="flex gap-2">
-            <select class="form-control text-sm" style="width:80px">
-                <option>10</option>
-                <option>25</option>
-                <option>50</option>
-            </select>
-        </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Input Invalid</label>
+      <input type="text" class="form-control is-invalid" value="salah">
+      <div class="invalid-feedback">Contoh pesan validasi.</div>
     </div>
-    <div class="overflow-x-auto">
-        <table class="table w-full text-sm">
-            <thead>
-                <tr class="bg-gray-50">
-                    <th class="py-2 px-4 text-left border-b"><input type="checkbox" class="form-check-input" id="select-all-demo" onchange="document.querySelectorAll('.row-cb').forEach(function(c){c.checked=this.checked},this)"></th>
-                    <th class="py-2 px-4 text-left border-b font-medium text-gray-600">Filter Row</th>
-                    <th class="py-2 px-4 text-left border-b font-medium text-gray-600"></th>
-                    <th class="py-2 px-4 text-left border-b font-medium text-gray-600"></th>
-                    <th class="py-2 px-4 text-left border-b font-medium text-gray-600"></th>
-                </tr>
-                <tr class="bg-gray-50">
-                    <th class="py-2 px-4 border-b font-medium text-gray-600">#</th>
-                    <th class="py-2 px-4 text-left border-b font-medium text-gray-600">Name</th>
-                    <th class="py-2 px-4 text-left border-b font-medium text-gray-600">Email</th>
-                    <th class="py-2 px-4 text-left border-b font-medium text-gray-600">Status</th>
-                    <th class="py-2 px-4 text-left border-b font-medium text-gray-600">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (int i = 1; i <= 5; i++)
-                {
-                    <tr class="hover:bg-gray-50 border-b border-gray-100">
-                        <td class="py-2 px-4"><input type="checkbox" class="form-check-input row-cb"></td>
-                        <td class="py-2 px-4 font-medium">Sample User @i</td>
-                        <td class="py-2 px-4 text-gray-500">user@(i)@@example.com</td>
-                        <td class="py-2 px-4">
-                            <span class="px-2 py-0.5 text-xs rounded-full @(i % 2 == 0 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")">
-                                @(i % 2 == 0 ? "Active" : "Inactive")
-                            </span>
-                        </td>
-                        <td class="py-2 px-4">
-                            <div class="dropdown">
-                                <button class="btn btn-primary-tw btn-sm dropdown-toggle" data-toggle-dd>Action</button>
-                                <div id="dd-row-@i" class="dropdown-menu">
-                                    <a href="#" class="dropdown-item"><i class="fas fa-edit"></i> Edit</a>
-                                    <a href="#" class="dropdown-item danger"><i class="fas fa-trash"></i> Delete</a>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Select</label>
+      <select class="form-control"><option>Active</option><option>Inactive</option></select>
     </div>
-    <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
-        <span>Showing 1–5 of 25</span>
-        <nav><ul class="pagination flex gap-1">
-            <li class="page-item disabled"><a class="page-link px-3 py-1 rounded border text-gray-400">Previous</a></li>
-            <li class="page-item active"><a class="page-link px-3 py-1 rounded border text-white" style="background:var(--primary)">1</a></li>
-            <li class="page-item"><a class="page-link px-3 py-1 rounded border text-gray-700 hover:bg-gray-100" href="#">2</a></li>
-            <li class="page-item"><a class="page-link px-3 py-1 rounded border text-gray-700 hover:bg-gray-100" href="#">3</a></li>
-            <li class="page-item disabled"><span class="page-link px-3 py-1 rounded border text-gray-400">…</span></li>
-            <li class="page-item"><a class="page-link px-3 py-1 rounded border text-gray-700 hover:bg-gray-100" href="#">5</a></li>
-            <li class="page-item"><a class="page-link px-3 py-1 rounded border text-gray-700 hover:bg-gray-100" href="#">Next</a></li>
+    <div class="mb-3">
+      <label class="form-label fw-semibold d-block">Checkbox</label>
+      <div class="d-flex flex-wrap gap-3 p-2 rounded border">
+        <label class="d-flex align-items-center gap-2"><input type="checkbox" checked class="w-4 h-4"><span>Opsi tercentang</span></label>
+        <label class="d-flex align-items-center gap-2"><input type="checkbox" class="w-4 h-4"><span>Opsi kosong</span></label>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Textarea (biasa)</label>
+      <textarea class="form-control" placeholder="Teks polos tanpa format"></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">File Upload (gambar)</label>
+      <div class="d-flex align-items-center gap-3">
+        <img id="filePreview" src="/be/default/img/placeholder.png" width="90" height="90"
+             class="rounded border p-1" style="object-fit:contain;background:#f8fafc"
+             onerror="this.style.visibility='hidden'">
+        <input id="fileUpload" type="file" name="file" accept="image/*" class="form-control">
+      </div>
+      <small class="text-muted">Form upload pakai <code>enctype="multipart/form-data"</code>. Gambar otomatis dikonversi ke WebP saat disimpan ke OSS.</small>
+    </div>
+    <button class="btn btn-primary-tw px-4 py-2"><i class="fas fa-save me-1"></i> Save</button>
+  </div>
+</section>
+
+<!-- ============ RICH TEXT EDITOR ============ -->
+<section class="mb-10">
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">8. Rich Text Editor (Trumbowyg + File Manager)</h2>
+  <div class="tw-card p-6">
+    <p class="text-sm text-gray-500 mb-4">
+      Textarea dengan toolbar format + tombol <em>File Manager</em> untuk unggah/sisip gambar
+      langsung ke OSS. Tambahkan class <code>trumbowyg-editor</code> pada textarea biasa
+      (lihat <strong>nomor 7</strong>) untuk mengaktifkannya.
+    </p>
+    <div class="mb-2">
+      <label class="form-label fw-semibold">Rich Text Editor + File Manager</label>
+      <textarea class="trumbowyg-editor form-control"><p>Tulis konten <strong>kaya format</strong> di sini. Klik ikon gambar pada toolbar untuk membuka <em>File Manager</em>.</p></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DATA TABLE + PAGINATION ============ -->
+<section class="mb-10">
+  <h2 class="text-lg font-bold mb-3" style="color:var(--primary)">9. Data Table + Pagination</h2>
+  <div class="tw-card p-0 overflow-hidden">
+    <div class="px-6 py-4 border-b flex items-center justify-between">
+      <h3 class="text-lg font-bold" style="color:var(--primary)">List</h3>
+      <a href="#" class="btn btn-success btn-sm"><i class="fas fa-fw fa-plus"></i> Add Data</a>
+    </div>
+    <div class="p-4" style="overflow-x:auto">
+      <table class="table table-bordered table-hover align-middle">
+        <thead>
+          <tr><th width="5%">No</th><th>Name</th><th width="15%">Status</th><th width="10%">Action</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td><td>Contoh Item</td>
+            <td class="text-left"><i class="fas fa-check-circle text-green-500 text-xl"></i></td>
+            <td class="text-center">
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle-dd>Action</button>
+                <div class="dropdown-menu dropdown-menu-end">
+                  <a href="#" class="dropdown-item"><i class="fas fa-pen fa-fw"></i> Edit</a>
+                  <div class="dropdown-divider"></div>
+                  <a href="#" class="dropdown-item danger"><i class="fas fa-trash fa-fw"></i> Delete</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="d-flex justify-content-end mt-4">
+        <nav><ul class="pagination">
+          <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">Next</a></li>
         </ul></nav>
+      </div>
     </div>
-</div>
+  </div>
+</section>
 
 @section Scripts {
 <script>
-// Counter animation
-document.querySelectorAll('.counter').forEach(function(el) {
-    var target = parseInt(el.getAttribute('data-target')) || 0;
-    var start = 0;
-    var step = Math.ceil(target / 80);
-    var timer = setInterval(function() {
-        start = Math.min(start + step, target);
-        el.textContent = start.toLocaleString();
-        if (start >= target) clearInterval(timer);
-    }, 16);
-});
+  // Aksen tema dari server (template switcher)
+  var cs=getComputedStyle(document.documentElement); var THEME={primary:cs.getPropertyValue('--primary').trim()||'#3B82F6',secondary:cs.getPropertyValue('--secondary').trim()||'#60A5FA',light:cs.getPropertyValue('--theme-light').trim()||'#EFF6FF',dark:cs.getPropertyValue('--theme-dark').trim()||'#1E3A8A'};
 
-// Charts
-var primary = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#3B82F6';
-var secondary = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim() || '#60A5FA';
+  // Counter animation
+  document.querySelectorAll('.counter').forEach(function(el){
+    var target = parseInt(el.getAttribute('data-target')), dur = 1200, step = target/(dur/16), cur = 0;
+    var t = setInterval(function(){ cur += step; if(cur>=target){cur=target; clearInterval(t);} el.textContent = Math.floor(cur).toLocaleString(); }, 16);
+  });
 
-new Chart(document.getElementById('lineChart'), {
-    type: 'line',
-    data: {
-        labels: ['Jan','Feb','Mar','Apr','May','Jun'],
-        datasets: [{
-            label: 'Revenue',
-            data: [12000, 19000, 15000, 22000, 18000, 28000],
-            borderColor: primary,
-            backgroundColor: primary + '20',
-            tension: 0.4,
-            fill: true
-        }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-});
+  // File upload: preview gambar sebelum submit
+  (function(){
+    var input = document.getElementById('fileUpload'), prev = document.getElementById('filePreview');
+    if (!input || !prev) return;
+    input.addEventListener('change', function(){
+      var f = this.files && this.files[0];
+      if (f && f.type.startsWith('image/')) { prev.src = URL.createObjectURL(f); prev.style.visibility = 'visible'; }
+    });
+  })();
 
-new Chart(document.getElementById('doughnutChart'), {
-    type: 'doughnut',
-    data: {
-        labels: ['Electronics','Fashion','Food','Sports'],
-        datasets: [{
-            data: [35, 25, 20, 20],
-            backgroundColor: [primary, secondary, '#10B981', '#F59E0B']
-        }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-});
-
-function openModal(id) { document.getElementById(id).classList.add('show'); }
-function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-function openConfirm(msg, cb) {
-    if (confirm(msg)) cb();
-}
-
-function previewFormImage(event) {
-    var box = document.getElementById('file-preview-box');
-    box.innerHTML = '';
-    var file = event.target.files[0];
-    if (file) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var img = document.createElement('img');
-            img.src = e.target.result;
-            img.style.maxWidth = '120px';
-            img.className = 'rounded border p-1';
-            box.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-    }
-}
+  // Chart line (warna ikut tema)
+  new Chart(document.getElementById('demoLine').getContext('2d'), {
+    type:'line',
+    data:{ labels:['Sen','Sel','Rab','Kam','Jum','Sab','Min'], datasets:[{ label:'Demo', data:[12,19,8,15,9,17,22], borderColor:THEME.primary, backgroundColor:'rgba(0,0,0,0.05)', borderWidth:3, fill:true, tension:0.4 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } }
+  });
+  // Chart doughnut (warna pertama ikut tema)
+  new Chart(document.getElementById('demoDoughnut').getContext('2d'), {
+    type:'doughnut',
+    data:{ labels:['A','B','C','D'], datasets:[{ data:[40,25,20,15], backgroundColor:[THEME.primary,'#10B981','#F59E0B','#EF4444'], borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+  });
 </script>
 }

@@ -89,7 +89,7 @@ public class RoleWebController : Controller
         }
     }
 
-    [HttpDelete("/admin/v1/access/role/{id}", Name = "admin.v1.access.role.delete")]
+    [HttpDelete("/admin/v1/access/role/{id}/delete", Name = "admin.v1.access.role.delete")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string id)
     {
@@ -107,12 +107,11 @@ public class RoleWebController : Controller
 
     [HttpDelete("/admin/v1/access/role/delete_selected", Name = "admin.v1.access.role.delete_selected")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteSelected([FromForm] string ids)
+    public async Task<IActionResult> DeleteSelected([FromForm(Name = "selected[]")] List<string> selected)
     {
         try
         {
-            var idList = (ids ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries);
-            await _roleService.DeleteSelectedAsync(idList);
+            await _roleService.DeleteSelectedAsync(selected ?? []);
             HttpContext.Session.SetSuccess("Delete Role Success.");
         }
         catch (AppException ex)
@@ -124,22 +123,81 @@ public class RoleWebController : Controller
 
     // ── Role → Permission management ────────────────────────────────────────────
 
-    [HttpGet("/admin/v1/access/role/{id}/permissions", Name = "admin.v1.access.role.permission.index")]
-    public async Task<IActionResult> Permissions(string id)
+    [HttpGet("/admin/v1/access/role/{id}/permission", Name = "admin.v1.access.role.permission.index")]
+    public async Task<IActionResult> Permissions(string id, [FromQuery] RolePermissionFilterDto filter)
     {
         var role = await _roleService.GetByIdAsync(id);
-        var allPerms = await _roleService.GetAllPermissionsAsync();
-        var assigned = await _roleService.GetPermissionsForRoleAsync(id);
-        var assignedIds = assigned.Select(p => p.Id).ToHashSet();
-
-        ViewBag.Title = $"Permissions — {role.Name}";
+        var result = await _roleService.GetPermissionsPaginatedAsync(id, filter);
+        ViewBag.Title = "Permission Management";
         ViewBag.Role = role;
-        ViewBag.AllPermissions = allPerms;
-        ViewBag.AssignedIds = assignedIds;
+        ViewBag.Result = result;
+        ViewBag.Filter = filter;
         return View("~/Views/AccessRole/Permissions.cshtml");
     }
 
-    [HttpPut("/admin/v1/access/role/{id}/permissions", Name = "admin.v1.access.role.permission.sync")]
+    [HttpGet("/admin/v1/access/role/{id}/permission/{permId}/assign", Name = "admin.v1.access.role.permission.assign")]
+    public async Task<IActionResult> AssignPermission(string id, string permId)
+    {
+        try
+        {
+            await _roleService.AssignPermissionAsync(id, permId);
+            HttpContext.Session.SetSuccess("Assign Permission Success.");
+        }
+        catch (AppException ex)
+        {
+            HttpContext.Session.SetError(ex.Message);
+        }
+        return RedirectToRoute("admin.v1.access.role.permission.index", new { id });
+    }
+
+    [HttpGet("/admin/v1/access/role/{id}/permission/{permId}/unassign", Name = "admin.v1.access.role.permission.unassign")]
+    public async Task<IActionResult> UnassignPermission(string id, string permId)
+    {
+        try
+        {
+            await _roleService.UnassignPermissionAsync(id, permId);
+            HttpContext.Session.SetSuccess("Unassign Permission Success.");
+        }
+        catch (AppException ex)
+        {
+            HttpContext.Session.SetError(ex.Message);
+        }
+        return RedirectToRoute("admin.v1.access.role.permission.index", new { id });
+    }
+
+    [HttpPost("/admin/v1/access/role/{id}/permission/assign_selected", Name = "admin.v1.access.role.permission.assign_selected")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AssignSelected(string id, [FromForm(Name = "selected[]")] List<string> selected)
+    {
+        try
+        {
+            await _roleService.AssignSelectedAsync(id, selected ?? []);
+            HttpContext.Session.SetSuccess("Assign Permission Success.");
+        }
+        catch (AppException ex)
+        {
+            HttpContext.Session.SetError(ex.Message);
+        }
+        return RedirectToRoute("admin.v1.access.role.permission.index", new { id });
+    }
+
+    [HttpPost("/admin/v1/access/role/{id}/permission/unassign_selected", Name = "admin.v1.access.role.permission.unassign_selected")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UnassignSelected(string id, [FromForm(Name = "selected[]")] List<string> selected)
+    {
+        try
+        {
+            await _roleService.UnassignSelectedAsync(id, selected ?? []);
+            HttpContext.Session.SetSuccess("Unassign Permission Success.");
+        }
+        catch (AppException ex)
+        {
+            HttpContext.Session.SetError(ex.Message);
+        }
+        return RedirectToRoute("admin.v1.access.role.permission.index", new { id });
+    }
+
+    [HttpPut("/admin/v1/access/role/{id}/permission", Name = "admin.v1.access.role.permission.sync")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SyncPermissions(string id, [FromForm] string permissions)
     {

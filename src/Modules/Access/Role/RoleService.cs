@@ -14,11 +14,14 @@ public class RoleService : IRoleService
     {
         var query = _db.Roles.AsNoTracking().AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(filter.Search))
-            query = query.WhereCiLike(r => r.Name, filter.Search);
+        if (!string.IsNullOrWhiteSpace(filter.QName))
+            query = query.WhereCiLike(r => r.Name, filter.QName);
 
-        if (!string.IsNullOrWhiteSpace(filter.Status))
-            query = query.Where(r => r.Status == filter.Status);
+        if (!string.IsNullOrWhiteSpace(filter.QStatus))
+            query = query.Where(r => r.Status == filter.QStatus);
+
+        if (!string.IsNullOrWhiteSpace(filter.QDesc))
+            query = query.Where(r => r.Desc != null && r.Desc.Contains(filter.QDesc));
 
         query = query.OrderBy(r => r.Name);
         return await PaginationHelper.PaginateAsync(query, filter.Page, filter.PageSize);
@@ -100,4 +103,75 @@ public class RoleService : IRoleService
 
     public async Task<List<PermissionEntity>> GetAllPermissionsAsync() =>
         await _db.Permissions.OrderBy(p => p.Name).ThenBy(p => p.Method).ToListAsync();
+
+    public async Task<PaginationResult<PermissionWithAssignedDto>> GetPermissionsPaginatedAsync(string roleId, RolePermissionFilterDto filter)
+    {
+        var assignedIds = (await _db.RolePermissions
+            .Where(rp => rp.RoleId == roleId)
+            .Select(rp => rp.PermissionId)
+            .ToListAsync()).ToHashSet();
+
+        var query = _db.Permissions.AsNoTracking().AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filter.QName))
+            query = query.WhereCiLike(p => p.Name, filter.QName);
+
+        if (!string.IsNullOrWhiteSpace(filter.QStatus))
+            query = query.Where(p => p.Status == filter.QStatus);
+
+        if (!string.IsNullOrWhiteSpace(filter.QDesc))
+            query = query.Where(p => p.Desc != null && p.Desc.Contains(filter.QDesc));
+
+        query = query.OrderBy(p => p.Name);
+
+        var rawResult = await PaginationHelper.PaginateAsync(query, filter.Page, filter.PageSize);
+
+        return new PaginationResult<PermissionWithAssignedDto>
+        {
+            Data = rawResult.Data.Select(p => new PermissionWithAssignedDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Desc = p.Desc,
+                IsAssigned = assignedIds.Contains(p.Id)
+            }).ToList(),
+            TotalCount = rawResult.TotalCount,
+            Page = rawResult.Page,
+            PageSize = rawResult.PageSize,
+            TotalPages = rawResult.TotalPages
+        };
+    }
+
+    public async Task AssignPermissionAsync(string roleId, string permId)
+    {
+        if (!await _db.RolePermissions.AnyAsync(rp => rp.RoleId == roleId && rp.PermissionId == permId))
+        {
+            _db.RolePermissions.Add(new RolePermission { RoleId = roleId, PermissionId = permId });
+            await _db.SaveChangesAsync();
+        }
+    }
+
+    public async Task UnassignPermissionAsync(string roleId, string permId)
+    {
+        var rp = await _db.RolePermissions.FirstOrDefaultAsync(rp => rp.RoleId == roleId && rp.PermissionId == permId);
+        if (rp != null) { _db.RolePermissions.Remove(rp); await _db.SaveChangesAsync(); }
+    }
+
+    public async Task AssignSelectedAsync(string roleId, IEnumerable<string> permIds)
+    {
+        foreach (var permId in permIds.Where(p => !string.IsNullOrWhiteSpace(p)))
+            if (!await _db.RolePermissions.AnyAsync(rp => rp.RoleId == roleId && rp.PermissionId == permId))
+                _db.RolePermissions.Add(new RolePermission { RoleId = roleId, PermissionId = permId });
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task UnassignSelectedAsync(string roleId, IEnumerable<string> permIds)
+    {
+        var idList = permIds.Where(p => !string.IsNullOrWhiteSpace(p)).ToList();
+        var existing = await _db.RolePermissions
+            .Where(rp => rp.RoleId == roleId && idList.Contains(rp.PermissionId))
+            .ToListAsync();
+        _db.RolePermissions.RemoveRange(existing);
+        await _db.SaveChangesAsync();
+    }
 }

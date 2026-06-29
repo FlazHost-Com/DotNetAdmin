@@ -45,7 +45,7 @@ public class UserApiController : ControllerBase
     }
 
     [HttpPost("/api/v1/access/user", Name = "api.v1.access.user.store")]
-    public async Task<IActionResult> Store([FromForm] UserCreateDto dto)
+    public async Task<IActionResult> Store([FromBody] UserCreateDto dto)
     {
         try
         {
@@ -57,7 +57,7 @@ public class UserApiController : ControllerBase
     }
 
     [HttpPut("/api/v1/access/user/{id}", Name = "api.v1.access.user.update")]
-    public async Task<IActionResult> Update(string id, [FromForm] UserUpdateDto dto)
+    public async Task<IActionResult> Update(string id, [FromBody] UserUpdateDto dto)
     {
         try
         {
@@ -79,4 +79,13 @@ public class UserApiController : ControllerBase
         }
         catch (NotFoundAppException ex) { return NotFound(new { success = false, message = ex.Message }); }
     }
+
+    [HttpPost("/api/v1/access/user/delete_selected", Name = "api.v1.access.user.delete_selected")]
+    public async Task<IActionResult> DeleteSelected([FromBody] DeleteSelectedRequest req)
+    {
+        await _userService.DeleteSelectedAsync(req.Selected ?? []);
+        return Ok(new { success = true, message = "Users deleted." });
+    }
+
+    public record DeleteSelectedRequest(List<string>? Selected);
 }

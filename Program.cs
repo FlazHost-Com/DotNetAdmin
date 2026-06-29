@@ -81,21 +81,32 @@ builder.Services.AddOptions<JwtBearerOptions>("JwtBearer")
         };
     });
 
-// Rate limiting (built-in .NET 7+) for auth endpoints
+// Rate limiting (built-in .NET 7+) for auth endpoints — loopback bypassed
 builder.Services.AddRateLimiter(o =>
 {
-    o.AddFixedWindowLimiter("auth", p =>
+    o.AddPolicy<string>("auth", ctx =>
     {
-        p.Window = TimeSpan.FromMinutes(15);
-        p.PermitLimit = 10;
-        p.QueueLimit = 0;
-        p.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        if (ctx.Connection.RemoteIpAddress is { } rip && System.Net.IPAddress.IsLoopback(rip))
+            return RateLimitPartition.GetNoLimiter("loopback");
+        var ip = ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+        {
+            Window = TimeSpan.FromMinutes(15),
+            PermitLimit = 10,
+            QueueLimit = 0,
+        });
     });
-    o.AddFixedWindowLimiter("otp", p =>
+    o.AddPolicy<string>("otp", ctx =>
     {
-        p.Window = TimeSpan.FromMinutes(15);
-        p.PermitLimit = 5;
-        p.QueueLimit = 0;
+        if (ctx.Connection.RemoteIpAddress is { } rip && System.Net.IPAddress.IsLoopback(rip))
+            return RateLimitPartition.GetNoLimiter("loopback");
+        var ip = ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        return RateLimitPartition.GetFixedWindowLimiter(ip, _ => new FixedWindowRateLimiterOptions
+        {
+            Window = TimeSpan.FromMinutes(15),
+            PermitLimit = 5,
+            QueueLimit = 0,
+        });
     });
     o.RejectionStatusCode = 429;
 });

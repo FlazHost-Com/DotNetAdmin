@@ -4,15 +4,11 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var result = (PaginationResult<User>)ViewBag.Result;
     var filter = (UserFilterDto)ViewBag.Filter;
+    int rowNum = result.From;
 }
 
 <div class="flex items-center justify-between mb-6">
     <h1 class="text-2xl font-bold text-gray-800">User Management</h1>
-    <div class="d-flex gap-2">
-        <a href="@Url.RouteUrl("admin.v1.access.user.create")" class="btn btn-primary-tw">
-            <i class="fas fa-plus me-1"></i> Add User
-        </a>
-    </div>
 </div>
 
 @if (ViewBag.FlashKey != null)
@@ -23,162 +19,144 @@
 }
 
 <div class="tw-card p-0 overflow-hidden">
-    <form method="get" action="@Url.RouteUrl("admin.v1.access.user.index")" class="p-4 border-b border-gray-100">
-        <div class="d-flex gap-3 flex-wrap">
-            <input type="text" name="Search" value="@filter.Search" placeholder="Search name, email, code..."
-                   class="form-control" style="max-width:280px">
-            <select name="Status" class="form-control" style="max-width:140px">
-                <option value="">All Status</option>
-                <option value="Active" selected="@(filter.Status == "Active")">Active</option>
-                <option value="Inactive" selected="@(filter.Status == "Inactive")">Inactive</option>
-            </select>
-            <button type="submit" class="btn btn-primary-tw"><i class="fas fa-search me-1"></i> Filter</button>
-            <a href="@Url.RouteUrl("admin.v1.access.user.index")" class="btn btn-danger">Reset</a>
-        </div>
-    </form>
-
-    <form id="bulk-form" method="post" action="@Url.RouteUrl("admin.v1.access.user.delete_selected")?_method=DELETE">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="ids" id="bulk-ids">
-
-        <div class="p-3 border-b border-gray-100 d-flex gap-2">
-            <button type="button" onclick="deleteSelected()" class="btn btn-danger btn-sm">
-                <i class="fas fa-trash me-1"></i> Delete Selected
+    <div class="px-6 py-4 border-b flex items-center justify-between">
+        <h2 class="text-lg font-bold" style="color:var(--primary)">User List</h2>
+        <div class="btn-group btn-sm">
+            <a href="@Url.RouteUrl("admin.v1.access.user.create")" class="btn btn-success btn-sm">
+                <i class="fas fa-fw fa-plus"></i> Add Data
+            </a>
+            <button type="submit" form="selection" formmethod="post"
+                    formaction="@Url.RouteUrl("admin.v1.access.user.delete_selected")?_method=DELETE"
+                    data-confirm="Confirm Delete" class="btn btn-danger btn-sm">
+                <i class="fas fa-fw fa-times"></i> Delete Selected
             </button>
         </div>
+    </div>
 
-        <div class="overflow-x-auto">
-            <table class="table table-hover">
-                <thead>
+    <div class="p-4" style="overflow-x:auto">
+        <table class="table table-bordered table-hover align-middle">
+            <thead>
+                <form id="searchform" method="get" action="@Url.RouteUrl("admin.v1.access.user.index")">
                     <tr>
-                        <th style="width:36px">
-                            <input type="checkbox" id="check-all" class="form-check-input">
+                        <th width="2%"></th>
+                        <th width="5%">
+                            <select name="q_page_size" id="q_page_size" class="form-control">
+                                <option value="10" selected="@(filter.PageSize == 10)">10</option>
+                                <option value="20" selected="@(filter.PageSize == 20)">20</option>
+                                <option value="50" selected="@(filter.PageSize == 50)">50</option>
+                                <option value="100" selected="@(filter.PageSize == 100)">100</option>
+                            </select>
                         </th>
-                        <th>Search / Filter Row</th>
-                    </tr>
-                    <tr>
-                        <th></th>
-                        <th>#</th>
-                        <th>Code</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Picture</th>
-                        <th>Roles</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @{int rowNum = result.From;}
-                @foreach (var user in result.Data)
-                {
-                    <tr>
-                        <td>
-                            <input type="checkbox" class="row-check form-check-input" value="@user.Id">
-                        </td>
-                        <td>@rowNum</td>
-                        <td>@user.Code</td>
-                        <td>@user.Name</td>
-                        <td>@user.Phone</td>
-                        <td>@user.Email</td>
-                        <td>
-                            <span class="badge @(user.Status == "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600")">
-                                @user.Status
-                            </span>
-                        </td>
-                        <td>
-                            @if (!string.IsNullOrEmpty(user.Picture))
-                            {
-                                <img src="@user.Picture" alt="picture" style="max-width:100px"
-                                     class="rounded border p-1">
-                            }
-                        </td>
-                        <td>
-                            @foreach (var ur in user.UserRoles)
-                            {
-                                <span class="badge text-bg-primary me-1">@ur.Role.Name</span>
-                            }
-                        </td>
-                        <td>
-                            <div class="d-flex gap-1">
-                                <a href="@Url.RouteUrl("admin.v1.access.user.edit", new { id = user.Id })"
-                                   class="btn btn-primary-tw btn-sm"><i class="fas fa-edit"></i></a>
-                                <form method="post" action="@Url.RouteUrl("admin.v1.access.user.delete", new { id = user.Id })?_method=DELETE"
-                                      onsubmit="return confirm('Delete this user?')">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></button>
-                                </form>
+                        <th><input type="text" name="q_name" value="@(filter.q_name ?? "")" placeholder="Name…" class="form-control"></th>
+                        <th><input type="text" name="q_email" value="@(filter.q_email ?? "")" placeholder="Email…" class="form-control"></th>
+                        <th><input type="text" name="q_code" value="@(filter.q_code ?? "")" placeholder="Code…" class="form-control"></th>
+                        <th>
+                            <select name="q_status" class="form-control">
+                                <option value="" disabled selected="@(string.IsNullOrEmpty(filter.q_status))">Status</option>
+                                <option value="Active" selected="@(filter.q_status == "Active")">Active</option>
+                                <option value="Inactive" selected="@(filter.q_status == "Inactive")">Inactive</option>
+                            </select>
+                        </th>
+                        <th><input type="text" name="q_role" value="@(filter.q_role ?? "")" placeholder="Role…" class="form-control"></th>
+                        <th colspan="3" class="text-center align-middle">
+                            <div class="btn-group">
+                                <button type="submit" form="searchform" class="btn btn-sm btn-success"><i class="fas fa-fw fa-search"></i></button>
+                                <a href="@Url.RouteUrl("admin.v1.access.user.index")" class="btn btn-sm btn-danger"><i class="fas fa-fw fa-times"></i></a>
                             </div>
-                        </td>
+                        </th>
                     </tr>
-                    rowNum++;
-                }
-                @if (!result.Data.Any())
-                {
-                    <tr><td colspan="10" class="text-center text-gray-400 py-8">No users found.</td></tr>
-                }
-                </tbody>
-            </table>
-        </div>
-    </form>
+                    <tr>
+                        <th><input type="checkbox" id="checkall"/></th>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Code</th>
+                        <th>Status</th>
+                        <th>Roles</th>
+                        <th>Picture</th>
+                        <th>Action</th>
+                    </tr>
+                </form>
+            </thead>
+            <tbody>
+                <form id="selection">
+                    @Html.AntiForgeryToken()
+                    @foreach (var user in result.Data)
+                    {
+                        <tr>
+                            <td><input type="checkbox" form="selection" name="ids" value="@user.Id"/></td>
+                            <td>@rowNum</td>
+                            <td>@user.Name</td>
+                            <td>@user.Email</td>
+                            <td>@user.Code</td>
+                            <td class="text-left">
+                                @if (user.Status == "Active")
+                                {
+                                    <i class="fas fa-check-circle text-green-500 text-xl" title="Active"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-times-circle text-red-500 text-xl" title="Inactive"></i>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var ur in user.UserRoles)
+                                {
+                                    <span class="badge text-bg-primary me-1">@ur.Role.Name</span>
+                                }
+                            </td>
+                            <td>
+                                <img src="@(string.IsNullOrEmpty(user.Picture) ? "/be/default/img/avatar.png" : user.Picture)"
+                                     alt="picture" style="max-width:60px" class="rounded border p-1">
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle-dd aria-expanded="false">Action</button>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <a href="@Url.RouteUrl("admin.v1.access.user.edit", new { id = user.Id })"
+                                           class="dropdown-item"><i class="fas fa-pen fa-fw"></i> Edit</a>
+                                        <div class="dropdown-divider"></div>
+                                        <form method="post" action="@Url.RouteUrl("admin.v1.access.user.delete", new { id = user.Id })?_method=DELETE" class="m-0">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" data-confirm="Confirm Delete" class="dropdown-item danger">
+                                                <i class="fas fa-trash fa-fw"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        rowNum++;
+                    }
+                    @if (!result.Data.Any())
+                    {
+                        <tr><td colspan="9" class="text-center text-gray-400 py-8">No users found.</td></tr>
+                    }
+                </form>
+            </tbody>
+        </table>
 
-    @* Windowed pagination *@
-    @if (result.TotalPages > 1)
-    {
-        <div class="p-4 d-flex align-items-center justify-content-between border-t border-gray-100">
-            <span class="text-sm text-gray-500">
-                Showing @result.From–@result.To of @result.TotalCount
-            </span>
-            <ul class="pagination">
-                @if (result.HasPrev)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.RouteUrl("admin.v1.access.user.index", new { filter.Search, filter.Status, Page = result.Page - 1, filter.PageSize })">
-                            &laquo;
-                        </a>
-                    </li>
-                }
-                @{
-                    int pStart = Math.Max(1, result.Page - 2);
-                    int pEnd   = Math.Min(result.TotalPages, result.Page + 2);
-                }
-                @if (pStart > 1) {
-                    <li class="page-item"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.user.index", new { filter.Search, filter.Status, Page = 1, filter.PageSize })">1</a></li>
-                    if (pStart > 2) { <li class="page-item disabled"><span class="page-link">…</span></li> }
-                }
-                @for (int p = pStart; p <= pEnd; p++)
-                {
-                    <li class="page-item @(p == result.Page ? "active" : "")">
-                        <a class="page-link" href="@Url.RouteUrl("admin.v1.access.user.index", new { filter.Search, filter.Status, Page = p, filter.PageSize })">@p</a>
-                    </li>
-                }
-                @if (pEnd < result.TotalPages) {
-                    if (pEnd < result.TotalPages - 1) { <li class="page-item disabled"><span class="page-link">…</span></li> }
-                    <li class="page-item"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.user.index", new { filter.Search, filter.Status, Page = result.TotalPages, filter.PageSize })">@result.TotalPages</a></li>
-                }
-                @if (result.HasNext)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.RouteUrl("admin.v1.access.user.index", new { filter.Search, filter.Status, Page = result.Page + 1, filter.PageSize })">
-                            &raquo;
-                        </a>
-                    </li>
-                }
-            </ul>
+        <div class="d-flex justify-content-end mt-4">
+            <nav>
+                <ul class="pagination">
+                    @if (result.HasPrev)
+                    {
+                        <li class="page-item"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.user.index", new { q_name = filter.q_name, q_email = filter.q_email, q_status = filter.q_status, q_role = filter.q_role, q_page_size = filter.PageSize, Page = result.Page - 1 })">Previous</a></li>
+                    }
+                    @for (int p = 1; p <= result.TotalPages; p++)
+                    {
+                        <li class="page-item @(p == result.Page ? "active" : "")"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.user.index", new { q_name = filter.q_name, q_email = filter.q_email, q_status = filter.q_status, q_role = filter.q_role, q_page_size = filter.PageSize, Page = p })">@p</a></li>
+                    }
+                    @if (result.HasNext)
+                    {
+                        <li class="page-item"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.user.index", new { q_name = filter.q_name, q_email = filter.q_email, q_status = filter.q_status, q_role = filter.q_role, q_page_size = filter.PageSize, Page = result.Page + 1 })">Next</a></li>
+                    }
+                </ul>
+            </nav>
         </div>
-    }
+    </div>
 </div>
 
 <script>
-document.getElementById('check-all').addEventListener('change', function() {
-    document.querySelectorAll('.row-check').forEach(c => c.checked = this.checked);
-});
-function deleteSelected() {
-    const ids = [...document.querySelectorAll('.row-check:checked')].map(c => c.value);
-    if (!ids.length) { alert('Select at least one user.'); return; }
-    if (!confirm('Delete ' + ids.length + ' user(s)?')) return;
-    document.getElementById('bulk-ids').value = ids.join(',');
-    document.getElementById('bulk-form').submit();
-}
+    $("#checkall").click(function () { $('input:checkbox').not(this).prop('checked', this.checked); });
 </script>

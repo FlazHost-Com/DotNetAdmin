@@ -66,8 +66,8 @@
         </div>
 
         <div class="mb-3">
-            <label for="PasswordConfirmation" class="form-label fw-semibold">Password Confirm</label>
-            <input id="PasswordConfirmation" type="password" name="PasswordConfirmation"
+            <label for="password_confirmation" class="form-label fw-semibold">Password Confirm</label>
+            <input id="password_confirmation" type="password" name="password_confirmation"
                    class="form-control">
         </div>
 
@@ -96,8 +96,8 @@
         </div>
 
         <div class="mb-3" id="div_blocked_reason">
-            <label for="BlockedReason" class="form-label fw-semibold">Blocked Reason</label>
-            <input id="BlockedReason" type="text" name="BlockedReason" value="@OldVal("blocked_reason")"
+            <label for="blocked_reason" class="form-label fw-semibold">Blocked Reason</label>
+            <input id="blocked_reason" type="text" name="blocked_reason" value="@OldVal("blocked_reason")"
                    class="form-control">
         </div>
 
@@ -147,7 +147,7 @@ $(document).ready(function() {
     $('#div_blocked_reason').toggle($('#Blocked').is(':checked'));
     $('#Blocked').click(function() {
         if (this.checked) { $('#div_blocked_reason').show(); }
-        else { $('#BlockedReason').val(''); $('#div_blocked_reason').hide(); }
+        else { $('#blocked_reason').val(''); $('#div_blocked_reason').hide(); }
     });
 });
 </script>

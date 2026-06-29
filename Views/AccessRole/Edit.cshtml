@@ -21,34 +21,33 @@
         @Html.AntiForgeryToken()
 
         <div class="mb-3">
-            <label for="Name" class="form-label fw-semibold">Name</label>
-            <input id="Name" type="text" name="Name" value="@V("name", role.Name)"
+            <label for="name" class="form-label fw-semibold">Name</label>
+            <input id="name" type="text" name="Name" value="@V("name", role.Name)"
                    class="form-control @(!string.IsNullOrEmpty(Err("name")) ? "is-invalid" : "")">
             @if (!string.IsNullOrEmpty(Err("name"))) { <div class="invalid-feedback">@Err("name")</div> }
         </div>
 
         <div class="mb-3">
-            <label for="Status" class="form-label fw-semibold">Status</label>
-            <select name="Status" id="Status" class="form-control">
+            <label for="status" class="form-label fw-semibold">Status</label>
+            <select name="Status" id="status" class="form-control @(!string.IsNullOrEmpty(Err("status")) ? "is-invalid" : "")" required>
                 <option value="Active" selected="@(V("status", role.Status) == "Active")">Active</option>
                 <option value="Inactive" selected="@(V("status", role.Status) == "Inactive")">Inactive</option>
             </select>
+            @if (!string.IsNullOrEmpty(Err("status"))) { <div class="invalid-feedback">@Err("status")</div> }
         </div>
 
-        <div class="mb-3">
-            <label for="Desc" class="form-label fw-semibold">Description</label>
-            <input id="Desc" type="text" name="Desc" value="@V("desc", role.Desc ?? "")" class="form-control">
+        <div class="mb-4">
+            <label for="desc" class="form-label fw-semibold">Description</label>
+            <input id="desc" type="text" name="Desc" value="@V("desc", role.Desc ?? "")"
+                   class="form-control @(!string.IsNullOrEmpty(Err("desc")) ? "is-invalid" : "")">
+            @if (!string.IsNullOrEmpty(Err("desc"))) { <div class="invalid-feedback">@Err("desc")</div> }
         </div>
 
         <div class="d-flex gap-2">
             <button type="submit" class="btn btn-primary-tw px-4 py-2">
                 <i class="fas fa-save me-1"></i> Save
             </button>
-            <a href="@Url.RouteUrl("admin.v1.access.role.permission.index", new { id = role.Id })"
-               class="btn btn-success px-4 py-2">
-                <i class="fas fa-key me-1"></i> Permissions
-            </a>
-            <a href="@Url.RouteUrl("admin.v1.access.role.index")" class="btn btn-danger px-4 py-2">Back</a>
+            <a href="@Url.RouteUrl("admin.v1.access.role.index")" class="btn btn-danger px-4 py-2 text-white">Back</a>
         </div>
     </form>
 </div>

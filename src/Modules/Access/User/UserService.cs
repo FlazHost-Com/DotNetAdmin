@@ -28,15 +28,29 @@ public class UserService : IUserService
             .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
             .AsQueryable();
 
-        if (!string.IsNullOrWhiteSpace(filter.Search))
-            query = query
-                .WhereCiLike(u => u.Name, filter.Search)
-                .Union(_db.Users.AsNoTracking().Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-                    .WhereCiLike(u => u.Email, filter.Search))
-                .Union(_db.Users.AsNoTracking().Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-                    .WhereCiLike(u => u.Code, filter.Search));
+        // Individual field filters (NodeAdmin standard: q_name, q_email, q_code, q_role)
+        if (!string.IsNullOrWhiteSpace(filter.q_name))
+            query = query.WhereCiLike(u => u.Name, filter.q_name);
+        if (!string.IsNullOrWhiteSpace(filter.q_email))
+            query = query.WhereCiLike(u => u.Email, filter.q_email);
+        if (!string.IsNullOrWhiteSpace(filter.q_code))
+            query = query.WhereCiLike(u => u.Code, filter.q_code);
+        if (!string.IsNullOrWhiteSpace(filter.q_status))
+            query = query.Where(u => u.Status == filter.q_status);
+        if (!string.IsNullOrWhiteSpace(filter.q_role))
+            query = query.Where(u => u.UserRoles.Any(ur => ur.Role.Name == filter.q_role));
 
-        if (!string.IsNullOrWhiteSpace(filter.Status))
+        // Legacy search box fallback
+        if (!string.IsNullOrWhiteSpace(filter.Search) &&
+            string.IsNullOrWhiteSpace(filter.q_name) && string.IsNullOrWhiteSpace(filter.q_email))
+        {
+            var s = filter.Search;
+            query = _db.Users.AsNoTracking().Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
+                .Where(u => u.Name.Contains(s) || u.Email.Contains(s) || u.Code.Contains(s));
+        }
+
+        // Legacy status filter
+        if (!string.IsNullOrWhiteSpace(filter.Status) && string.IsNullOrWhiteSpace(filter.q_status))
             query = query.Where(u => u.Status == filter.Status);
 
         query = query.OrderByDescending(u => u.CreatedAt);
@@ -54,14 +68,14 @@ public class UserService : IUserService
 
     public async Task<UserEntity> CreateAsync(UserCreateDto dto, string createdBy)
     {
-        Validate(dto.Code, dto.Name, dto.Email, dto.Password, dto.PasswordConfirmation);
+        Validate(dto.Code, dto.Name, dto.Email, dto.Password, dto.password_confirmation);
 
         if (await _db.Users.AnyAsync(u => u.Email == dto.Email))
             throw new ConflictAppException("Email already in use.");
         if (await _db.Users.AnyAsync(u => u.Code == dto.Code))
             throw new ConflictAppException("Code already in use.");
 
-        var picturePath = await SavePictureAsync(dto.Picture);
+        var picturePath = dto.Picture;
 
         var user = new UserEntity
         {
@@ -73,7 +87,7 @@ public class UserService : IUserService
             Password = BCrypt.Net.BCrypt.HashPassword(dto.Password, _config.BcryptRounds),
             Status = dto.Status,
             Blocked = dto.Blocked,
-            BlockedReason = dto.Blocked ? dto.BlockedReason?.Trim() : null,
+            BlockedReason = dto.Blocked ? dto.blocked_reason?.Trim() : null,
             Timezone = string.IsNullOrWhiteSpace(dto.Timezone) ? "UTC" : dto.Timezone,
             Picture = picturePath,
             CreatedBy = createdBy,
@@ -101,7 +115,7 @@ public class UserService : IUserService
 
         if (!string.IsNullOrWhiteSpace(dto.Password))
         {
-            if (dto.Password != dto.PasswordConfirmation)
+            if (dto.Password != dto.password_confirmation)
                 throw new ValidationAppException("Passwords do not match.");
             user.Password = BCrypt.Net.BCrypt.HashPassword(dto.Password, _config.BcryptRounds);
         }
@@ -109,7 +123,7 @@ public class UserService : IUserService
         if (dto.Picture != null)
         {
             DeletePicture(user.Picture);
-            user.Picture = await SavePictureAsync(dto.Picture);
+            user.Picture = dto.Picture;
         }
 
         user.Code = dto.Code.Trim();
@@ -118,7 +132,7 @@ public class UserService : IUserService
         user.Email = dto.Email.Trim().ToLowerInvariant();
         user.Status = dto.Status;
         user.Blocked = dto.Blocked;
-        user.BlockedReason = dto.Blocked ? dto.BlockedReason?.Trim() : null;
+        user.BlockedReason = dto.Blocked ? dto.blocked_reason?.Trim() : null;
         user.Timezone = string.IsNullOrWhiteSpace(dto.Timezone) ? "UTC" : dto.Timezone;
         user.UpdatedBy = updatedBy;
 

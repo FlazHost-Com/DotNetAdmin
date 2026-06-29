@@ -12,11 +12,11 @@ public class SettingUpdateDto
     public string? Email { get; set; }
     public string? Copyright { get; set; }
     public string? Theme { get; set; }
-    public string? FeTemplate { get; set; }
-    public IFormFile? IconFile { get; set; }
-    public IFormFile? LogoFile { get; set; }
-    public IFormFile? FaviconFile { get; set; }
-    public IFormFile? LoginImageFile { get; set; }
+    public string? fe_template { get; set; }
+    public IFormFile? icon { get; set; }
+    public IFormFile? logo { get; set; }
+    public IFormFile? favicon { get; set; }
+    public IFormFile? login_image { get; set; }
 }
 
 public interface ISettingService

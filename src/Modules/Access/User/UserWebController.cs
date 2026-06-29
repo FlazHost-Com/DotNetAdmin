@@ -134,13 +134,13 @@ public class UserWebController : Controller
     {
         ["code"] = dto.Code, ["name"] = dto.Name, ["phone"] = dto.Phone ?? "",
         ["email"] = dto.Email, ["timezone"] = dto.Timezone, ["status"] = dto.Status,
-        ["blocked"] = dto.Blocked ? "1" : "0", ["blocked_reason"] = dto.BlockedReason ?? ""
+        ["blocked"] = dto.Blocked ? "1" : "0", ["blocked_reason"] = dto.blocked_reason ?? ""
     };
 
     private static Dictionary<string, string> BuildOldUpdate(UserUpdateDto dto) => new()
     {
         ["code"] = dto.Code, ["name"] = dto.Name, ["phone"] = dto.Phone ?? "",
         ["email"] = dto.Email, ["timezone"] = dto.Timezone, ["status"] = dto.Status,
-        ["blocked"] = dto.Blocked ? "1" : "0", ["blocked_reason"] = dto.BlockedReason ?? ""
+        ["blocked"] = dto.Blocked ? "1" : "0", ["blocked_reason"] = dto.blocked_reason ?? ""
     };
 }

@@ -1,77 +1,136 @@
 @using DotNetAdmin.Core.Data.Entities
+@using DotNetAdmin.Modules.Access.Role.Dtos
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var role = (Role)ViewBag.Role;
-    var allPerms = (List<Permission>)ViewBag.AllPermissions;
-    var assignedIds = (HashSet<string>)ViewBag.AssignedIds;
-
-    var grouped = allPerms
-        .GroupBy(p => p.GuardName ?? "web")
-        .OrderBy(g => g.Key)
-        .ToList();
+    var result = (PaginationResult<PermissionWithAssignedDto>)ViewBag.Result;
+    var filter = (RolePermissionFilterDto)ViewBag.Filter;
+    int rowNum = result.From;
 }
 
 <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Permissions — @role.Name</h1>
-    <a href="@Url.RouteUrl("admin.v1.access.role.index")" class="btn btn-danger">
-        <i class="fas fa-arrow-left me-1"></i> Back
-    </a>
+    <h1 class="text-2xl font-bold text-gray-800">Permission Management</h1>
 </div>
 
-<form method="post"
-      action="@Url.RouteUrl("admin.v1.access.role.permission.sync", new { id = role.Id })?_method=PUT"
-      id="perm-form">
-    @Html.AntiForgeryToken()
-    <input type="hidden" name="permissions" id="perm-ids">
-
-    <div class="tw-card p-6 mb-4">
-        <div class="d-flex align-items-center justify-content-between mb-4">
-            <h2 class="text-lg font-bold" style="color:var(--primary)">Assign Permissions</h2>
-            <div class="d-flex gap-2">
-                <button type="button" onclick="selectAll()" class="btn btn-primary-tw btn-sm">Select All</button>
-                <button type="button" onclick="deselectAll()" class="btn btn-danger btn-sm">Deselect All</button>
-                <button type="button" onclick="savePerms()" class="btn btn-success">
-                    <i class="fas fa-save me-1"></i> Save
-                </button>
-            </div>
+<div class="tw-card p-0 overflow-hidden">
+    <div class="px-6 py-4 border-b flex items-center justify-between">
+        <h2 class="text-lg font-bold" style="color:var(--primary)">Permission List</h2>
+        <div class="btn-group btn-sm">
+            <button type="submit" form="selection" formmethod="post"
+                    formaction="@Url.RouteUrl("admin.v1.access.role.permission.assign_selected", new { id = role.Id })"
+                    data-confirm="Confirm Assign" class="btn btn-info btn-sm">
+                <i class="fas fa-fw fa-check"></i> Assign Selected
+            </button>
+            <button type="submit" form="selection" formmethod="post"
+                    formaction="@Url.RouteUrl("admin.v1.access.role.permission.unassign_selected", new { id = role.Id })"
+                    data-confirm="Confirm Unassign" class="btn btn-danger btn-sm">
+                <i class="fas fa-fw fa-times"></i> Unassign Selected
+            </button>
         </div>
-
-        @foreach (var group in grouped)
-        {
-            <div class="mb-5">
-                <h3 class="text-sm font-bold uppercase tracking-wider mb-2 px-2 py-1 rounded"
-                    style="background:var(--theme-light);color:var(--theme-dark)">
-                    Guard: @group.Key
-                </h3>
-                <div class="d-flex flex-wrap gap-2">
-                    @foreach (var perm in group.OrderBy(p => p.Name))
-                    {
-                        <label class="d-flex align-items-center gap-1.5 px-3 py-1.5 rounded border text-sm cursor-pointer hover:bg-gray-50">
-                            <input type="checkbox" class="perm-check form-check-input" value="@perm.Id"
-                                   @(assignedIds.Contains(perm.Id) ? "checked" : "")>
-                            <span>
-                                <span class="badge bg-blue-100 text-blue-700 me-1">@perm.Method</span>
-                                @perm.Name
-                            </span>
-                        </label>
-                    }
-                </div>
-            </div>
-        }
-
-        @if (!allPerms.Any())
-        {
-            <p class="text-gray-400 text-center py-8">No permissions found. Run permission sync first.</p>
-        }
     </div>
-</form>
+
+    <div class="p-4" style="overflow-x:auto">
+        <table class="table table-bordered table-hover align-middle">
+            <thead>
+                <form id="searchform" method="get" action="@Url.RouteUrl("admin.v1.access.role.permission.index", new { id = role.Id })">
+                    <tr>
+                        <th width="2%"></th>
+                        <th width="7%">
+                            <select name="q_page_size" id="q_page_size" class="form-control">
+                                <option value="10" selected="@(filter.PageSize == 10)">10</option>
+                                <option value="20" selected="@(filter.PageSize == 20)">20</option>
+                                <option value="50" selected="@(filter.PageSize == 50)">50</option>
+                                <option value="100" selected="@(filter.PageSize == 100)">100</option>
+                            </select>
+                        </th>
+                        <th width="20%"><input id="q_name" type="text" class="form-control" name="q_name" value="@filter.QName"></th>
+                        <th width="10%">
+                            <select name="q_status" id="q_status" class="form-control">
+                                <option disabled selected="@(string.IsNullOrEmpty(filter.QStatus))">Select</option>
+                                <option value="Active" selected="@(filter.QStatus == "Active")">Active</option>
+                                <option value="Inactive" selected="@(filter.QStatus == "Inactive")">Inactive</option>
+                            </select>
+                        </th>
+                        <th width="15%"><input id="q_desc" type="text" class="form-control" name="q_desc" value="@filter.QDesc"></th>
+                        <th width="5%" class="text-center align-middle">
+                            <div class="btn-group">
+                                <button type="submit" form="searchform" class="btn btn-sm btn-success"><i class="fas fa-fw fa-search"></i></button>
+                                <a href="@Url.RouteUrl("admin.v1.access.role.permission.index", new { id = role.Id })" class="btn btn-sm btn-danger"><i class="fas fa-fw fa-times"></i></a>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th width="5%"><input type="checkbox" id="checkall"/></th>
+                        <th width="5%">No</th>
+                        <th width="20%">Name</th>
+                        <th width="15%">Status</th>
+                        <th width="10%">Description</th>
+                        <th width="5%">Action</th>
+                    </tr>
+                </form>
+            </thead>
+            <tbody>
+                <form id="selection">
+                    @Html.AntiForgeryToken()
+                    @foreach (var perm in result.Data)
+                    {
+                        <tr>
+                            <td><input name="selected[]" value="@perm.Id" type="checkbox"/></td>
+                            <td>@rowNum</td>
+                            <td>@perm.Name</td>
+                            <td class="text-left">
+                                @if (perm.IsAssigned)
+                                {
+                                    <i class="fas fa-check-circle text-green-500 text-xl" title="Assigned"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-times-circle text-gray-300 text-xl" title="Not assigned"></i>
+                                }
+                            </td>
+                            <td>@perm.Desc</td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle-dd aria-expanded="false">Action</button>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <a href="@Url.RouteUrl("admin.v1.access.role.permission.assign", new { id = role.Id, permId = perm.Id })" class="dropdown-item"><i class="fas fa-check fa-fw"></i> Assign</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a href="@Url.RouteUrl("admin.v1.access.role.permission.unassign", new { id = role.Id, permId = perm.Id })" class="dropdown-item danger"><i class="fas fa-times fa-fw"></i> Unassign</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        rowNum++;
+                    }
+                    @if (!result.Data.Any())
+                    {
+                        <tr><td colspan="6" class="text-center text-gray-400 py-4">No data yet.</td></tr>
+                    }
+                </form>
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-end mt-4">
+            <nav>
+                <ul class="pagination">
+                    @if (result.HasPrev)
+                    {
+                        <li class="page-item"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.role.permission.index", new { id = role.Id, q_name = filter.QName, q_status = filter.QStatus, q_desc = filter.QDesc, q_page_size = filter.PageSize, Page = result.Page - 1 })">Previous</a></li>
+                    }
+                    @for (int p = 1; p <= result.TotalPages; p++)
+                    {
+                        <li class="page-item @(p == result.Page ? "active" : "")"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.role.permission.index", new { id = role.Id, q_name = filter.QName, q_status = filter.QStatus, q_desc = filter.QDesc, q_page_size = filter.PageSize, Page = p })">@p</a></li>
+                    }
+                    @if (result.HasNext)
+                    {
+                        <li class="page-item"><a class="page-link" href="@Url.RouteUrl("admin.v1.access.role.permission.index", new { id = role.Id, q_name = filter.QName, q_status = filter.QStatus, q_desc = filter.QDesc, q_page_size = filter.PageSize, Page = result.Page + 1 })">Next</a></li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
 
 <script>
-function selectAll()  { document.querySelectorAll('.perm-check').forEach(c => c.checked = true); }
-function deselectAll(){ document.querySelectorAll('.perm-check').forEach(c => c.checked = false); }
-function savePerms() {
-    const ids = [...document.querySelectorAll('.perm-check:checked')].map(c => c.value);
-    document.getElementById('perm-ids').value = ids.join(',');
-    document.getElementById('perm-form').submit();
-}
+    $("#checkall").click(function(){ $('input:checkbox').not(this).prop('checked', this.checked); });
 </script>

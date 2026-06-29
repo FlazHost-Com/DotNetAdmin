@@ -42,12 +42,12 @@ public class SettingService : ISettingService
         if (dto.Email != null) setting.Email = dto.Email;
         if (dto.Copyright != null) setting.Copyright = dto.Copyright;
         if (!string.IsNullOrEmpty(dto.Theme)) setting.Theme = dto.Theme;
-        if (!string.IsNullOrEmpty(dto.FeTemplate))
+        if (!string.IsNullOrEmpty(dto.fe_template))
         {
             var oldTemplate = setting.FeTemplate;
-            setting.FeTemplate = dto.FeTemplate;
-            if (oldTemplate != dto.FeTemplate)
-                _ = _feTemplate.EnsureAsync(dto.FeTemplate); // fire-and-forget cache warmup
+            setting.FeTemplate = dto.fe_template;
+            if (oldTemplate != dto.fe_template)
+                _ = _feTemplate.EnsureAsync(dto.fe_template); // fire-and-forget cache warmup
         }
 
         if (dto.Description != null)
@@ -57,10 +57,10 @@ public class SettingService : ISettingService
             setting.Description = sanitizer.Sanitize(dto.Description);
         }
 
-        await SaveFileAsync(dto.IconFile, "setting", n => setting.Icon = n);
-        await SaveFileAsync(dto.LogoFile, "setting", n => setting.Logo = n);
-        await SaveFileAsync(dto.FaviconFile, "setting", n => setting.Favicon = n);
-        await SaveFileAsync(dto.LoginImageFile, "setting", n => setting.LoginImage = n);
+        await SaveFileAsync(dto.icon, "setting", n => setting.Icon = n);
+        await SaveFileAsync(dto.logo, "setting", n => setting.Logo = n);
+        await SaveFileAsync(dto.favicon, "setting", n => setting.Favicon = n);
+        await SaveFileAsync(dto.login_image, "setting", n => setting.LoginImage = n);
 
         await _db.SaveChangesAsync();
         _cache.InvalidateCache();
