@@ -1,0 +1,50 @@
+name: Sync app → flazhost-runner
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: sync-runner
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Mint GitHub App token (scoped, 1 jam)
+        id: apptoken
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.RUNNER_SYNC_APP_ID }}
+          private-key: ${{ secrets.RUNNER_SYNC_APP_KEY }}
+          owner: flazhost-runner
+          repositories: dotnetadmin
+
+      - name: Sync kode app → flazhost-runner (file deploy dipertahankan)
+        env:
+          TOKEN: ${{ steps.apptoken.outputs.token }}
+        run: |
+          set -euo pipefail
+          git clone --depth 1 "https://x-access-token:${TOKEN}@github.com/flazhost-runner/dotnetadmin.git" target
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='/Dockerfile' \
+            --exclude='/docker-entrypoint.sh' \
+            --exclude='/.dockerignore' \
+            --exclude='/.github/' \
+            . target/
+          cd target
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Tidak ada perubahan kode app — lewati."
+            exit 0
+          fi
+          git config user.name  flazhost-bot
+          git config user.email bot@flazhost.com
+          git commit -q -m "sync app: from FlazHost-Com/DotNetAdmin@${GITHUB_SHA::7}"
+          git push origin HEAD:main
