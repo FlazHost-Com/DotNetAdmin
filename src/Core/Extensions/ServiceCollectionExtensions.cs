@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
         // - database : simpan sesi di tabel DB via EF Core (persist lintas restart).
         //              Jalankan migration dulu agar tabel sesi tersedia.
         // - memory   : in-process memory; hanya untuk dev/single-node.
-        var sessionDriver = configuration["Session:Driver"] ?? "redis";
+        var sessionDriver = configuration["Session:Driver"] ?? "database";
         if (sessionDriver == "database")
         {
             services.AddDistributedMemoryCache(); // EF Core session via IDistributedCache wrapper
