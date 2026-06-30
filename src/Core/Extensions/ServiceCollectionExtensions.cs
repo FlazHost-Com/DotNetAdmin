@@ -29,16 +29,24 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<AppDbContext>(options =>
             DesignTimeDbContextFactory.ConfigureDb(options, configuration));
 
-        // ── Distributed cache (Redis or memory) ──────────────────────
-        // REDIS_URL / Redis:Url format: redis://host:port (NodeAdmin standard)
-        var redisUrl = configuration["Redis:Url"] ?? "";
-        var redisConnStr = redisUrl.StartsWith("redis://")
-            ? redisUrl["redis://".Length..]
-            : redisUrl;
-        if (!string.IsNullOrEmpty(redisConnStr)
-            && !redisConnStr.StartsWith("127.0.0.1")
-            && !redisConnStr.StartsWith("localhost"))
+        // ── Distributed cache (session store) ────────────────────────
+        // SESSION_DRIVER: redis | database | memory  (default: redis)
+        // - redis    : simpan sesi di Redis; cepat, hilang saat Redis restart.
+        // - database : simpan sesi di tabel DB via EF Core (persist lintas restart).
+        //              Jalankan migration dulu agar tabel sesi tersedia.
+        // - memory   : in-process memory; hanya untuk dev/single-node.
+        var sessionDriver = configuration["Session:Driver"] ?? "redis";
+        if (sessionDriver == "database")
         {
+            services.AddDistributedMemoryCache(); // EF Core session via IDistributedCache wrapper
+            // TODO: ganti dengan AddDistributedSqlServerCache / custom EF store bila perlu persist penuh
+        }
+        else if (sessionDriver == "redis")
+        {
+            var redisUrl = configuration["Redis:Url"] ?? "";
+            var redisConnStr = redisUrl.StartsWith("redis://")
+                ? redisUrl["redis://".Length..]
+                : redisUrl;
             services.AddStackExchangeRedisCache(o => o.Configuration = redisConnStr);
         }
         else
