@@ -7,10 +7,9 @@ name: Sync app → flazhost-runner
 # Prasyarat: secret RUNNER_SYNC_APP_ID + RUNNER_SYNC_APP_KEY (GitHub App) di
 # Settings → Secrets → Actions repo ini (FlazHost-Com/DotNetAdmin).
 # App harus punya Contents:write ke repo flazhost-runner/dotnetadmin.
+# Repo ini tidak punya workflow CI — sync langsung saat push ke main.
 on:
-  workflow_run:
-    workflows: ["CI"]
-    types: [completed]
+  push:
     branches: [main]
   workflow_dispatch:
 
@@ -21,7 +20,6 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout (SHA yang lolos CI)
         uses: actions/checkout@v4
